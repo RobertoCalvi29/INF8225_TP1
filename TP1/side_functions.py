@@ -60,35 +60,23 @@ def get_loss(y: np.ndarray, y_pred: np.ndarray) -> int:
     """
     return -np.dot(y, np.log(y_pred))
 
-def get_gradient():
-    pass
+
+def update_moment(m, v, grad, beta_1, beta_2):
+    m = beta_1 * m + (1 - beta_1) * grad
+    v = beta_2 * v + (1 - beta_2) * grad ** 2
+    return m, v
 
 
-def update_moment(moment_dict:dict, gradient:int):
-    beta_1 = None
-    beta_2 = None
-    pass
+def compute_bias(m, v, t, beta_1, beta_2):
+    hat_m = m / (1 - beta_1 ** t)
+    hat_v = v / (1 - beta_2 ** t)
+    return  hat_m, hat_v
 
 
-def compute_bias(moment_dict:dict):
-    pass
-
-
-def update_theta(theta , moment_dict):
-    pass
-
-
-# def generate_minibatch(X_train: np.array, y_train, minibatch_size: int) -> [range, np.array, np.array, int]:
-#     """
-#     Function to allow minibatch creation
-#     :param theta: Matrix of size NXL+1
-#     :param minibatch_size: what it says
-#     :param
-#     :return:
-#     """
-#     batches = range(0, X_train.shape[0], minibatch_size)
-#     nb_of_batch = X_train.shape[0] // minibatch_size
-#     nb_examples = X_train.shape[0] // nb_of_batch
-#     X_train = [X_train[i:i + minibatch_size, :] for i in batches]
-#     y_train = [y_train[i:i + minibatch_size, :] for i in batches]
-#     return batches, X_train, y_train, nb_examples
+def generate_minibatchs(X_train: np.array, y_train, minibatch_size: int) -> [range, np.array, np.array, int]:
+    batches = range(0, X_train.shape[0], minibatch_size)
+    nb_of_batch = X_train.shape[0] // minibatch_size
+    nb_examples = X_train.shape[0] // nb_of_batch
+    X_train = [X_train[i:i + minibatch_size, :] for i in batches]
+    y_train = [y_train[i:i + minibatch_size, :] for i in batches]
+    return batches, X_train, y_train, nb_examples

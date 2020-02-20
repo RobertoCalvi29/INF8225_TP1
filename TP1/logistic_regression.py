@@ -4,7 +4,14 @@ from sklearn.model_selection import train_test_split
 from TP1.side_functions import get_accuracy, softmax, get_grads, get_loss
 
 
-def logistic_regression(X, y, minibatch_size, lr):
+def logistic_regression(X: np.array, y: np.array, minibatch_size: int, lr: int, epochs) -> int:
+    """
+    :param X: Inputs matrix of size NXL
+    :param y: output matrix of size NXk
+    :param minibatch_size: an interger to represent the size of the mini batch
+    :param lr: an integer to give a certain learning rate
+    :return accuracy_on_unseen_data: The accuracy
+    """
     y_one_hot = np.zeros((y.shape[0], len(np.unique(y))))
     y_one_hot[np.arange(y.shape[0]), y] = 1  # one hot target or shape NxK
 
@@ -20,24 +27,23 @@ def logistic_regression(X, y, minibatch_size, lr):
 
     best_W = None
     best_accuracy = 0
-    nb_epochs = 50
     losses = []
     losses_validation = []
     accuracies = []
-    nb_examples = X_train.shape[0]
 
-    for epoch in range(nb_epochs):
+    for epoch in range(epochs):
         loss = 0
         loss_validation = 0
         grad = 0
 
         permutation = np.random.permutation(X_train.shape[0])
-        X_train = X_train[permutation, :]
-        y_train = y_train[permutation, :]
+        X_train_t = X_train[permutation, :]
+        y_train_t = y_train[permutation, :]
 
+        nb_examples = X_train_t.shape[1]
         for example in range(nb_examples):
-            y_pred = softmax(W.dot(X_train[example]))
-            grad -= get_grads(y_train[example], y_pred, X_train[example])
+            y_pred = softmax(W.dot(X_train_t[example]))
+            grad -= get_grads(y_train_t[example], y_pred, X_train_t[example])
 
             if example != 0 and example % minibatch_size == 0:  # Update W on every minibatch
                 grad_moy = grad / minibatch_size
@@ -58,7 +64,7 @@ def logistic_regression(X, y, minibatch_size, lr):
             y_pred = softmax(np.dot(W, X_validation[example]))
             loss_validation += get_loss(y_validation[example], y_pred)
 
-        losses_validation.append(loss_validation / nb_examples )
+        losses_validation.append(loss_validation / nb_examples)
 
         # compute the accuracy on the validation set
         accuracy = get_accuracy(X_validation, y_validation, W)
